@@ -89,6 +89,24 @@ class SamPredictor:
         self.features = self.model.image_encoder(input_image)
         self.is_image_set = True
 
+    @torch.no_grad()
+    def save_image_embedding(self, path):
+        if not self.is_image_set:
+            raise RuntimeError("An image must be set with .set_image(...) before embedding saving.")
+        res = {
+            'original_size' : self.original_size,
+            'input_size' : self.input_size,
+            'features' : self.features,
+            'is_image_set' : True
+            }
+        torch.save(res,path)
+
+    @torch.no_grad()
+    def load_image_embedding(self, path):
+        res = torch.load(path, self.device)
+        for k,v in res.items():
+            setattr(self,k,v)
+
     def predict(
         self,
         point_coords: Optional[np.ndarray] = None,
